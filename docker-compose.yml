@@ -1,0 +1,36 @@
+services:
+  app:
+    build: ./app
+    container_name: render-app
+    environment:
+      DATABASE_URL: postgres://postgres:password@db:5432/mydb
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+        - app_net
+  db:
+    container_name: render-db
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydb
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 3s
+      timeout: 5s
+      retries: 10
+    networks:
+        - app_net
+
+volumes:
+  db_data:
+
+networks:
+  app_net:
