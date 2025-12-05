@@ -1,25 +1,20 @@
 const express = require("express");
-const { Client } = require("pg");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-const client = new Client({
-  connectionString: process.env.DATABASE_URL,
-});
+const API_KEY = process.env.API_KEY;
 
 async function start() {
   try {
-    await client.connect();
-    console.log("Connected to Postgres! 💾");
-
     app.get("/", async (req, res) => {
-      const result = await client.query("SELECT NOW()");
-      res.json({ hello: "world", db_time: result.rows[0] });
+      if (!API_KEY)
+        res.json({ hello: "visit another time, know we're our of api key" });
+      else 
+          res.json({ hello: "Hi mom!" });
     });
 
     app.listen(PORT, () =>
-      console.log(`App running on http://localhost:${PORT}`)
+      console.log(`App running on http://localhost:${PORT}`),
     );
   } catch (err) {
     console.error("Could not start app:", err);
